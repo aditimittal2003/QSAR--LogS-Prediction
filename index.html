@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QSAR Model for Solubility (LogS) Prediction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .prediction-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-lg">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Solubility (LogS) Predictor</h1>
+            <p class="text-gray-500 mt-2">Enter a SMILES string to get the corresponding LogS value</p>
+        </header>
+
+        <main>
+            <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                <input type="text" id="smiles-input" placeholder="e.g., CCO (Ethanol)" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <button id="predict-btn" class="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Predict LogS
+                </button>
+            </div>
+            
+            <div id="status-container" class="text-center min-h-[24px] mb-6">
+                <div id="loader" class="hidden animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+                <p id="error-message" class="text-red-500 font-medium"></p>
+            </div>
+
+            <div id="results-section" class="hidden space-y-6">
+                <div class="prediction-card text-white p-6 rounded-xl shadow-lg text-center">
+                    <h2 class="text-lg font-medium opacity-80">Predicted LogS Value</h2>
+                    <p id="prediction-value" class="text-5xl font-bold mt-2"></p>
+                    <p class="text-sm mt-2 opacity-70">(log mol/L)</p>
+                </div>
+
+                <div id="ad-status" class="text-center p-3 rounded-lg">
+                    <p id="ad-message" class="font-semibold"></p>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-xl border flex flex-col items-center justify-center">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-2">2D Structure</h2>
+                    <div id="molecule-viewer" class="w-full max-w-sm"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const smilesInput = document.getElementById('smiles-input');
+            const predictBtn = document.getElementById('predict-btn');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('error-message');
+            const resultsSection = document.getElementById('results-section');
+            const moleculeViewer = document.getElementById('molecule-viewer');
+            const predictionValue = document.getElementById('prediction-value');
+            const adStatus = document.getElementById('ad-status');
+            const adMessage = document.getElementById('ad-message');
+
+            const API_URL = 'http://127.0.0.1:5000/api/predict';
+
+            predictBtn.addEventListener('click', handlePrediction);
+            smilesInput.addEventListener('keypress', (e) => e.key === 'Enter' && handlePrediction());
+
+            async function handlePrediction() {
+                const smiles = smilesInput.value.trim();
+                if (!smiles) {
+                    showError("Please enter a SMILES string.");
+                    return;
+                }
+
+                resetUI();
+                loader.classList.remove('hidden');
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ smiles: smiles })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.error || 'An unknown error occurred.');
+                    }
+
+                    predictionValue.textContent = data.prediction;
+                    moleculeViewer.innerHTML = data.molecule_svg;
+                    
+                    if (data.is_in_ad) {
+                        adStatus.className = 'text-center p-3 rounded-lg bg-green-100 text-green-800';
+                        adMessage.textContent = '✔️ Inside Applicability Domain';
+                    } else {
+                        adStatus.className = 'text-center p-3 rounded-lg bg-yellow-100 text-yellow-800';
+                        adMessage.textContent = '⚠️ Outside Applicability Domain: Prediction may be less reliable.';
+                    }
+                    
+                    resultsSection.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    showError(`Error: ${error.message}. Is the Flask server running?`);
+                } finally {
+                    loader.classList.add('hidden');
+                }
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+            }
+
+            function resetUI() {
+                errorMessage.textContent = '';
+                resultsSection.classList.add('hidden');
+                adMessage.textContent = ''; 
+            }
+        });
+    </script>
+</body>
+</html>
