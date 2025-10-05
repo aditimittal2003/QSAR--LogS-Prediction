@@ -6,3 +6,5 @@ Flask
 Flask-Cors
 lightgbm
 requests
+matplotlib
+seaborn

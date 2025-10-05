@@ -237,11 +237,21 @@ print("- Saved AD parameters to 'saved_model/ad_params.json'")
 # 8. Visualise and Interpret
 print("\n--- Interpreting the Final Trained Model ---")
 
-# The primary performance visualization is the boxplot of CV scores shown earlier.
 # Here, we will visualize the feature importances of the *final model*
-# that was trained on the entire dataset.
 
-# Check for feature_importances_ (for tree-based models like RandomForest, LightGBM)
+# Plot actual vs. predicted values
+y_pred = final_model.predict(X_full_scaled)
+plt.figure(figsize=(8, 8))
+sns.scatterplot(x=y, y=y_pred, alpha=0.6)
+plt.plot([y.min(), y.max()], [y.min(), y.max()], '--', color='red', linewidth=2)
+plt.xlabel("Actual LogS")
+plt.ylabel("Predicted LogS")
+plt.title(f"Actual vs. Predicted LogS for {best_model_name}")
+plt.savefig('actual_vs_predicted.png', bbox_inches='tight')
+print("\n- Saved Actual vs. Predicted plot to 'actual_vs_predicted.png'")
+plt.show()
+
+# Check for feature_importances_
 if hasattr(final_model, 'feature_importances_'):
     print(f"\nFeature Importance for the final {best_model_name} model:")
     
