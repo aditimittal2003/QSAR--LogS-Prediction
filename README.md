@@ -5,27 +5,19 @@ A simple web application that predicts the aqueous solubility (LogS) of a molecu
 ## ## Demo
 
 <p align="center">
-  <strong>Application Demo</strong>
+  <strong>Initial View</strong><br>
+  <img src="Demo/app-initial-view.png" alt="Initial view of the predictor" width="700">
 </p>
-
-<table align="center">
-  <tr>
-    <td align="center">Initial View</td>
-    <td align="center">Successful Prediction (Inside AD)</td>
-    <td align="center">Prediction with AD Warning</td>
-  </tr>
-  <tr>
-    <td>
-      <img src="assets/app-initial-view.png" alt="Initial view of the predictor" width="100%">
-    </td>
-    <td>
-      <img src="assets/app-prediction-success.png" alt="Successful prediction for Glycerol" width="100%">
-    </td>
-    <td>
-      <img src="assets/app-ad-warning.png" alt="Prediction for Hexaiodobenzene with an AD warning" width="100%">
-    </td>
-  </tr>
-</table>
+<hr>
+<p align="center">
+  <strong>Successful Prediction (Inside AD)</strong><br>
+  <img src="Demo/app-prediction-success.png" alt="Successful prediction for Glycerol" width="700">
+</p>
+<hr>
+<p align="center">
+  <strong>Prediction with AD Warning</strong><br>
+  <img src="Demo/app-ad-warning.png" alt="Prediction for Hexaiodobenzene with an AD warning" width="700">
+</p>
 
 ---
 ## ## Features
@@ -42,8 +34,8 @@ Follow these steps to get the application running on your local machine.
 ### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-cd your-repo-name
+git clone https://github.com/aditimittal2003/QSAR--LogS-Prediction.git
+cd QSAR--LogS-Prediction
 ```
 
 ### 2. Set Up the Environment
