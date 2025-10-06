@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import joblib
 import json
@@ -30,6 +30,10 @@ except FileNotFoundError:
 DESC_NAMES = [desc[0] for desc in Descriptors._descList]
 CALCULATOR = MoleculeDescriptors.MolecularDescriptorCalculator(DESC_NAMES)
 # --------------------------------------------------------------------
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
@@ -78,4 +82,5 @@ def predict():
         return jsonify({'error': 'An error occurred during prediction.'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

@@ -66,8 +66,9 @@
             const predictionValue = document.getElementById('prediction-value');
             const adStatus = document.getElementById('ad-status');
             const adMessage = document.getElementById('ad-message');
+            
+            const API_URL = window.location.origin + '/api/predict';
 
-            const API_URL = 'http://127.0.0.1:5000/api/predict';
 
             predictBtn.addEventListener('click', handlePrediction);
             smilesInput.addEventListener('keypress', (e) => e.key === 'Enter' && handlePrediction());
